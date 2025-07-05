@@ -1100,3 +1100,42 @@ class TestCheckSize(TestCase):
                 (1, 1), allow_floating_point=False
             )
         )
+
+    def test_valid_tuple_with_integers(self):
+        # CT1: C1=F, C2=F, C3=T, C4=F, C5=F, C6=F, C7=F
+        self.assertIsNone(image_operations.ImageTransform._check_size((2, 2), allow_floating_point=False))
+
+    def test_size_not_a_tuple(self):
+        # CT2: C1=V
+        with self.assertRaises(TypeError):
+            image_operations.ImageTransform._check_size([2, 2], allow_floating_point=False)
+
+    def test_tuple_with_one_element(self):
+        # CT3: C2=V
+        with self.assertRaises(TypeError):
+            image_operations.ImageTransform._check_size((2,), allow_floating_point=False)
+
+    def test_float_in_size0_not_allowed(self):
+        # CT4: C4=V, C3=T
+        with self.assertRaises(TypeError):
+            image_operations.ImageTransform._check_size((1.5, 2), allow_floating_point=False)
+
+    def test_float_in_size1_not_allowed(self):
+        # CT5: C5=V, C3=T
+        with self.assertRaises(TypeError):
+            image_operations.ImageTransform._check_size((2, 1.5), allow_floating_point=False)
+
+    def test_floats_allowed(self):
+        # CT6: C3=F
+        self.assertIsNone(image_operations.ImageTransform._check_size((1.5, 2.5), allow_floating_point=True))
+
+    def test_width_less_than_1(self):
+        # CT7: C6=V
+        with self.assertRaises(ValueError):
+            image_operations.ImageTransform._check_size((0, 5), allow_floating_point=False)
+
+    def test_height_less_than_1(self):
+        # CT8: C7=V
+        with self.assertRaises(ValueError):
+            image_operations.ImageTransform._check_size((5, 0), allow_floating_point=False)
+
